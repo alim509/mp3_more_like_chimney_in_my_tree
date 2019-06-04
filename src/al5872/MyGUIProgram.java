@@ -1,13 +1,15 @@
-package com.company;
+package al5872;
+
+
+import javazoom.jl.player.Player;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
+import java.io.FileInputStream;
+import java.util.ArrayList;
 
 public class MyGUIProgram extends Frame {
 
@@ -17,12 +19,11 @@ public class MyGUIProgram extends Frame {
     private JMenu library, help;
     private JMenuItem furtherOption1, furtherOption2;
     private JPanel panel;
-    private JLabel label;
     private JTextField tf;
-    private JButton send, reset;
+    private JButton play;
     private JTextArea ta;
-    private Media m;
-    private MediaPlayer mP;
+    private ArrayList<Player> MP3FilePlayers;
+;
 
     // Constructor to setup the GUI components
     public MyGUIProgram(String name, int width, int height, String tb1, String tb2, String tb1o1, String tb1o2, String bb1, String bb2, String bb3) {
@@ -45,14 +46,12 @@ public class MyGUIProgram extends Frame {
 
         //Creating the panel at bottom and adding components
         panel = new JPanel(); // the panel is not visible in output
-        label = new JLabel(bb1);
+        //search = new JButton(bb1);
         tf = new JTextField(10); // accepts upto 10 characters
-        send = new JButton(bb2);
-        reset = new JButton(bb3);
-        panel.add(label); // Components Added using Flow Layout
+        play = new JButton(bb2);
+        //panel.add(search); // Components Added using Flow Layout
         panel.add(tf);
-        panel.add(send);
-        panel.add(reset);
+        panel.add(play);
 
         // Text Area at the Center
         ta = new JTextArea();
@@ -63,14 +62,51 @@ public class MyGUIProgram extends Frame {
         frame.getContentPane().add(BorderLayout.CENTER, ta);
         frame.setVisible(true);
 
-        send.addActionListener(new ActionListener() {
+        //File g = new File("/Users/al5872/IdeaProjects/mp3_more_like_chimney_in_my_tree/Chimney MP3/bensound-summer.mp3");
+        File folder = new File("Chimney MP3");
+        File[] files = folder.listFiles();
+        MP3FilePlayers = new ArrayList<Player>();
+        for(int i = 0; i< files.length; i++)
+        {
+            try
+            {
+                MP3FilePlayers.add(new Player(new FileInputStream(files[i].getPath())));
+            }
+            catch (Exception e)
+            {
+                System.out.println("welp");
+            }
+        }
+        try
+        {
+            MP3FilePlayers.get(0).play();
+        }
+        catch (Exception e)
+        {
+            System.out.println("well shit");
+        }
+
+        String list = "";
+        files[0].toURI().getPath();
+        for(File f: files)
+        {
+            list = (list + (f + "").substring(72, (f + "").length() - 4) + "\n");
+        }
+        ta.setText(list);
+
+        play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String search = tf.getText();
+                playPause();
             }
 
         });
 
+
+    }
+
+    public void playPause()
+    {
 
     }
 
