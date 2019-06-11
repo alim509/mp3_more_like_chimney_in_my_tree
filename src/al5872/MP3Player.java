@@ -1,45 +1,86 @@
 package al5872;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 
-public class MP3Player
-{
-    private AudioInputStream ais;
-    private Clip mp3Clip;
-    private boolean isPlaying;
+import javazoom.jl.player.Player;
 
 
-    public MP3Player(File file)
-    {
-        try
-        {
-            ais = AudioSystem.getAudioInputStream(file.getAbsoluteFile());
-            mp3Clip = AudioSystem.getClip();
-            isPlaying = false;
-        }
-        catch (Exception e)
-        {
+public class MP3Player {
+
+    private Player player;
+    private FileInputStream FIS;
+    private BufferedInputStream BIS;
+    private boolean canResume;
+    private String path;
+    private int total;
+    private int stopped;
+    private boolean valid;
+
+    public MP3Player(){
+        player = null;
+        FIS = null;
+        valid = false;
+        BIS = null;
+        path = null;
+        total = 0;
+        stopped = 0;
+        canResume = false;
+    }
+
+    public boolean canResume(){
+        return canResume;
+    }
+
+    public void setPath(String path){
+        this.path = path;
+    }
+
+    public void pause(){
+        try{
+            stopped = FIS.available();
+            player.close();
+            FIS = null;
+            BIS = null;
+            player = null;
+            if(valid)
+                canResume = true;
+        }catch(Exception e){
 
         }
     }
 
-    public void play()
-    {
-        if(!isPlaying)
-        {
-            try
-            {
-                mp3Clip.open(ais);
-                mp3Clip.start();
-                isPlaying = !isPlaying;
-            }
-            catch (Exception e)
-            {
-
-            }
-        }
+    public void resume(){
+        if(!canResume)
+            return;
+        if(play(total-stopped))
+            canResume = false;
     }
+
+    public boolean play(int pos){
+        valid = true;
+        canResume = false;
+        try{
+            FIS = new FileInputStream(path);
+            total = FIS.available();
+            if(pos > -1) FIS.skip(pos);
+            BIS = new BufferedInputStream(FIS);
+            player = new Player(BIS);
+            new Thread(
+                    new Runnable(){
+                        public void run(){
+                            try{
+                                player.play();
+                            }catch(Exception e){
+                                valid = false;
+                            }
+                        }
+                    }
+            ).start();
+        }catch(Exception e){
+            valid = false;
+        }
+        return valid;
+    }
+
 }
