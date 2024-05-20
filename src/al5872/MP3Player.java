@@ -2,9 +2,7 @@ package al5872;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-
 import javazoom.jl.player.Player;
-
 
 public class MP3Player {
 
